@@ -249,7 +249,7 @@
       } catch(e) {}
 
       if(playerOptions.length < 10) {
-        const temp = ["Vishvajeet", "Shonit", "Aditya J", "Savli", "Siddhant", "", "Aniket", "Pooja", "Neha", "Kiran"];
+        const temp = ["Vishvajeet", "Shonit", "Aditya J", "Savli", "Siddhant", "", "Aniket", "Samarth C", "Digvijay", "Mali"];
         while(playerOptions.length < 10 && temp.length > 0) {
           const n = temp.shift();
           if(!playerOptions.some(p => p.name === n)) {
@@ -270,7 +270,7 @@
 
       if(questions.length === 0) {
         questions = [
-          { id: "q1", category: "Standard Q", text: "Group madhye saglyat jaast late yenara kon?", type: "vote" }
+          { id: "q1", category: "Standard Q", text: " nehami late yenara?", type: "vote" }
         ];
       }
 
@@ -373,7 +373,7 @@
         currentIndex++;
         renderQuestion();
       } else {
-        alert("अभिनंदन! तुम्ही सर्व प्रश्नांची उत्तरे यशस्वीपणे सबमिट केली आहेत. 🎉");
+        alert("Congratulations! You have successfully submitted all the answers. 🎉");
       }
     };
 
