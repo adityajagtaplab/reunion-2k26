@@ -167,7 +167,7 @@
       const vSnap = await getDocs(collection(db, "votes"));
       const pSnap = await getDocs(collection(db, "players"));
 
-      // 1. Map Player IDs to Names
+      // 1. Player ID -> Real Name mapping
       let playerNames = {};
       pSnap.forEach(d => {
         playerNames[d.id] = d.data().name;
@@ -177,9 +177,17 @@
       qSnap.forEach(d => questions.push({ id: d.id, ...d.data() }));
 
       let votesDocs = [];
-      vSnap.forEach(d => votesDocs.push({ playerId: d.id, answers: d.data().answers || {} }));
+      vSnap.forEach(d => {
+        let rawId = d.id;
+        let data = d.data();
+        votesDocs.push({ 
+          playerId: rawId, 
+          playerName: data.playerName || data.name || playerNames[rawId] || rawId, 
+          answers: data.answers || {} 
+        });
+      });
 
-      // 2. Find Majority Answer (Right Answer) for each Question
+      // 2. Majority Answer for each Question
       let rightAnswers = {};
       questions.forEach(q => {
         let tally = {};
@@ -201,7 +209,7 @@
         rightAnswers[q.id] = majorityAns;
       });
 
-      // 3. Calculate Scores for Each Player
+      // 3. Calculate Scores
       let playerScores = [];
       votesDocs.forEach(v => {
         let score = 0;
@@ -210,17 +218,18 @@
             score++;
           }
         }
-        let name = playerNames[v.playerId] || v.playerId;
-        playerScores.push({ name: name, score: score });
+        
+        let displayName = playerNames[v.playerId] || v.playerName;
+        playerScores.push({ name: displayName, score: score });
       });
 
-      // Sort by Highest Score
+      // Sort by Score
       playerScores.sort((a, b) => b.score - a.score);
 
-      // 4. Render Top 3 Winners
+      // 4. Display
       container.innerHTML = '';
       if (playerScores.length === 0) {
-        container.innerHTML = '<p style="text-align:center;">अजून कोणत्याही व्होट्सची नोंद झालेली नाही.</p>';
+        container.innerHTML = '<p style="text-align:center;">अजून व्होट्स आलेले नाहीत.</p>';
         return;
       }
 
