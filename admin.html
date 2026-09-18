@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Panel — Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    padding: 20px 14px;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--paper);
+    border: 3px solid var(--maroon);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 4px 4px 0 var(--mustard);
+  }
+
+  h1, h2 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--maroon);
+    margin-top: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 10px 0 4px;
+    color: var(--maroon-dark);
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-family: 'Poppins', sans-serif;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  button {
+    margin-top: 14px;
+    padding: 10px 16px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 16px;
+    color: #fff;
+    background: var(--maroon);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .btn-del {
+    background: #a94444;
+    padding: 4px 8px;
+    font-size: 12px;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Reunion Admin Panel ⚙️</h1>
+
+  <!-- ACCESS CODE SETTINGS -->
+  <div class="card">
+    <h2>1. Access Code Settings</h2>
+    <label>Current Access Code</label>
+    <input type="text" id="accessCodeInput" placeholder="2026" />
+    <button id="saveCodeBtn">Save Access Code</button>
+  </div>
+
+  <!-- MANAGE PLAYERS -->
+  <div class="card">
+    <h2>2. Manage Players</h2>
+    <label>Add New Player Name</label>
+    <input type="text" id="newPlayerName" placeholder="Player Name" />
+    <button id="addPlayerBtn">Add Player</button>
+    <hr style="border: 0.5px dashed var(--line); margin: 16px 0;">
+    <label>Player List:</label>
+    <div id="playersList">Loading...</div>
+  </div>
+
+  <!-- ADD QUESTION -->
+  <div class="card">
+    <h2>3. Add Question</h2>
+    <label>Question Category</label>
+    <select id="qCategory">
+      <option value="Standard Q">Standard Q</option>
+      <option value="Quiz">Quiz</option>
+      <option value="Childhood Photo">Childhood Photo</option>
+      <option value="Zoomed Photo">Zoomed Photo</option>
+      <option value="Old Status/Caption">Old Status/Caption</option>
+    </select>
+
+    <label>Question Text</label>
+    <input type="text" id="qText" placeholder="उदा. लहानपणीचा फोटो कोणाचा आहे?" />
+
+    <label>Image URL (Optional)</label>
+    <input type="text" id="qImg" placeholder="https://..." />
+
+    <label>Custom Options (Optional - Comma `,` देउन खेळाडू/पर्याय टाका. रिकामे ठेवल्यास default 10 खेळाडू दिसतील)</label>
+    <textarea id="qCustomOptions" rows="2" placeholder="eg. Rahul, Priya, Canteen, Warden, Option 5..."></textarea>
+
+    <button id="addQBtn">Add Question</button>
+
+    <hr style="border: 0.5px dashed var(--line); margin: 16px 0;">
+    <label>Added Questions List:</label>
+    <div id="questionsList">Loading...</div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, setDoc, getDoc, addDoc, deleteDoc } 
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCePBzR9A533G67wycWgGRluEu1wMGujYg",
+    authDomain: "reunion-2k26.firebaseapp.com",
+    projectId: "reunion-2k26",
+    storageBucket: "reunion-2k26.firebasestorage.app",
+    messagingSenderId: "982280621446",
+    appId: "1:982280621446:web:851f2d3e55b854ad077007"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Load Access Code
+  async function loadSettings() {
+    const snap = await getDoc(doc(db, "config", "Settings"));
+    if(snap.exists()) {
+      document.getElementById('accessCodeInput').value = snap.data().accessCode || "2026";
+    }
+  }
+  loadSettings();
+
+  document.getElementById('saveCodeBtn').onclick = async () => {
+    const code = document.getElementById('accessCodeInput').value.trim();
+    if(code) {
+      await setDoc(doc(db, "config", "Settings"), { accessCode: code });
+      alert("Access Code Saved!");
+    }
+  };
+
+  // Players Management
+  async function loadPlayersList() {
+    const snap = await getDocs(collection(db, "players"));
+    const container = document.getElementById('playersList');
+    container.innerHTML = '';
+    snap.forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.innerHTML = `<span>${d.data().name}</span> <button class="btn-del" onclick="deletePlayer('${d.id}')">Delete</button>`;
+      container.appendChild(div);
+    });
+  }
+  loadPlayersList();
+
+  window.deletePlayer = async (id) => {
+    await deleteDoc(doc(db, "players", id));
+    loadPlayersList();
+  };
+
+  document.getElementById('addPlayerBtn').onclick = async () => {
+    const name = document.getElementById('newPlayerName').value.trim();
+    if(name) {
+      await addDoc(collection(db, "players"), { name: name, active: true });
+      document.getElementById('newPlayerName').value = '';
+      loadPlayersList();
+    }
+  };
+
+  // Questions Management
+  async function loadQuestionsList() {
+    const snap = await getDocs(collection(db, "questions"));
+    const container = document.getElementById('questionsList');
+    container.innerHTML = '';
+    snap.forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'list-item';
+      div.innerHTML = `<span><b>[${d.data().category}]</b> ${d.data().text}</span> <button class="btn-del" onclick="deleteQuestion('${d.id}')">Delete</button>`;
+      container.appendChild(div);
+    });
+  }
+  loadQuestionsList();
+
+  window.deleteQuestion = async (id) => {
+    await deleteDoc(doc(db, "questions", id));
+    loadQuestionsList();
+  };
+
+  // Add Question Logic Updated
+  document.getElementById('addQBtn').onclick = async () => {
+    const cat = document.getElementById('qCategory').value;
+    const text = document.getElementById('qText').value.trim();
+    const img = document.getElementById('qImg').value.trim();
+    const customOpts = document.getElementById('qCustomOptions').value.trim();
+
+    if(!text) return;
+
+    let optionsArray = [];
+    if(customOpts !== "") {
+      optionsArray = customOpts.split(',').map(item => item.trim()).filter(item => item !== "");
+    }
+
+    await addDoc(collection(db, "questions"), {
+      category: cat,
+      text: text,
+      imageUrl: img || null,
+      customOptions: optionsArray.length > 0 ? optionsArray : null,
+      createdAt: new Date()
+    });
+
+    document.getElementById('qText').value = '';
+    document.getElementById('qImg').value = '';
+    document.getElementById('qCustomOptions').value = '';
+
+    loadQuestionsList();
+  };
+</script>
+
+</body>
+</html>

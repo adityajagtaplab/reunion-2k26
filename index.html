@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--paper);
+    border: 3px solid var(--maroon);
+    border-radius: 18px;
+    padding: 28px 22px 26px;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--mustard);
+  }
+
+  .stamp {
+    position: absolute;
+    top: -18px;
+    right: 18px;
+    background: var(--mustard);
+    color: var(--maroon-dark);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    transform: rotate(6deg);
+    box-shadow: 2px 2px 0 var(--maroon);
+  }
+
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--maroon);
+    font-size: 34px;
+    margin: 10px 0 2px;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: #6B6354;
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--maroon-dark);
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--ink);
+    appearance: none;
+  }
+
+  input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: var(--mustard);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%237A2E2E'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 18px 0 20px;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+
+  .checkbox-row input {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--maroon);
+    flex-shrink: 0;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: var(--maroon);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.2s ease;
+  }
+
+  button:disabled {
+    background: #C9BFA8;
+    cursor: not-allowed;
+  }
+
+  button:not(:disabled):active {
+    transform: scale(0.97);
+    background: var(--maroon-dark);
+  }
+
+  .error {
+    color: var(--maroon-dark);
+    font-size: 12px;
+    margin-top: 10px;
+    min-height: 16px;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .doodle {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+  
+</style>
+</head>
+<body>
+
+  <!-- Auto Redirect script if user already logged in -->
+  <script>
+    if (localStorage.getItem('reunionEntered') === 'true') {
+      window.location.replace('instructions.html');
+    }
+  </script>
+
+  <div class="card">
+    <div class="stamp">Technical (Active) Batch</div>
+    <div class="doodle">🎓✨</div>
+    <h1>Reunion 2K26 🥂🎉</h1>
+    <p class="subtitle">Fill the following Details ⬇️</p>
+
+    <div class="field">
+      <label for="accessCode">Access Code</label>
+      <input type="text" id="accessCode" placeholder="Enter Code" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+    </div>
+
+    <div class="field">
+      <label for="playerName">Choose Your Name</label>
+      <select id="playerName">
+        <option value="" disabled selected>-- Select Name --</option>
+      </select>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="confirmBox" />
+      <label for="confirmBox" style="margin:0; font-weight:400;">
+        Yes, I am the chosen one and I am ready to play the game.
+      </label>
+    </div>
+
+    <button id="enterBtn" disabled>Enter</button>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, doc, getDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCePBzR9A533G67wycWgGRluEu1wMGujYg",
+      authDomain: "reunion-2k26.firebaseapp.com",
+      projectId: "reunion-2k26",
+      storageBucket: "reunion-2k26.firebasestorage.app",
+      messagingSenderId: "982280621446",
+      appId: "1:982280621446:web:851f2d3e55b854ad077007"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const accessCodeInput = document.getElementById('accessCode');
+    const playerSelect = document.getElementById('playerName');
+    const confirmBox = document.getElementById('confirmBox');
+    const enterBtn = document.getElementById('enterBtn');
+    const errorMsg = document.getElementById('errorMsg');
+
+    async function loadPlayers() {
+      try {
+        const q = query(collection(db, "players"), where("active", "==", true));
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+          const defaultPlayers = [
+            { id: "p1", name: "Rahul" },
+            { id: "p2", name: "Priya" },
+            { id: "p3", name: "Amit" }
+          ];
+          defaultPlayers.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name;
+            playerSelect.appendChild(opt);
+          });
+          return;
+        }
+
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const opt = document.createElement('option');
+          opt.value = docSnap.id;
+          opt.textContent = data.name;
+          playerSelect.appendChild(opt);
+        });
+      } catch (err) {
+        errorMsg.textContent = "PLAYERS LOAD ERROR: " + err.message;
+      }
+    }
+    loadPlayers();
+
+    function updateButtonState() {
+      const ready = accessCodeInput.value.trim() !== '' &&
+                    playerSelect.value !== '' &&
+                    confirmBox.checked;
+      enterBtn.disabled = !ready;
+    }
+    accessCodeInput.addEventListener('input', updateButtonState);
+    playerSelect.addEventListener('change', updateButtonState);
+    confirmBox.addEventListener('change', updateButtonState);
+
+    enterBtn.addEventListener('click', async () => {
+      errorMsg.textContent = '';
+      enterBtn.disabled = true;
+      enterBtn.textContent = 'connecting...';
+
+      try {
+        const configSnap = await getDoc(doc(db, "config", "Settings"));
+        const typed = accessCodeInput.value.trim();
+        const validCode = configSnap.exists() ? configSnap.data().accessCode : "2026";
+
+        if (typed !== validCode) {
+          errorMsg.textContent = "Invalid Access Code!";
+          enterBtn.disabled = false;
+          enterBtn.textContent = 'Enter';
+          return;
+        }
+
+        localStorage.setItem('reunionPlayerId', playerSelect.value);
+        localStorage.setItem('reunionPlayerName', playerSelect.options[playerSelect.selectedIndex].textContent);
+        localStorage.setItem('reunionEntered', 'true');
+
+        window.location.replace('instructions.html');
+      } catch (err) {
+        errorMsg.textContent = "ERROR: " + err.code + " | " + err.message;
+        enterBtn.disabled = false;
+        enterBtn.textContent = 'Enter';
+      }
+    });
+  </script>
+
+</body>
+</html>

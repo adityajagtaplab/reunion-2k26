@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Game — Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper);
+    border: 3px solid var(--maroon);
+    border-radius: 18px;
+    padding: 26px 22px 24px;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--mustard);
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    background: var(--mustard);
+    color: var(--maroon-dark);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--maroon);
+  }
+
+  .progress-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--maroon);
+  }
+
+  .q-type {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--mustard);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  h2 {
+    font-family: 'Poppins', sans-serif;
+    color: var(--maroon-dark);
+    font-size: 17px;
+    margin: 0 0 16px;
+    line-height: 1.4;
+  }
+
+  .img-container {
+    width: 100%;
+    max-height: 220px;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 2px solid var(--line);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eae3d2;
+  }
+
+  .img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .option-btn {
+    width: 100%;
+    padding: 10px 12px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .option-btn:not(:disabled):active {
+    border-color: var(--maroon);
+    background: #FBF3DC;
+  }
+
+  .option-btn.selected {
+    border-color: var(--maroon) !important;
+    background: var(--maroon) !important;
+    color: #fff !important;
+    font-weight: 600;
+  }
+
+  .option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+
+  .nav-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  button.action-btn {
+    flex: 1;
+    padding: 14px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: var(--maroon);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.2s ease;
+  }
+
+  button.action-btn:disabled {
+    background: #C9BFA8;
+    cursor: not-allowed;
+  }
+
+  button.secondary {
+    background: #A89B84;
+  }
+
+  .status-tag {
+    font-size: 11px;
+    color: #7A2E2E;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="header-row">
+      <span class="badge" id="playerTag">PLAYER</span>
+      <span class="progress-text" id="progressText">Q 1 / 5</span>
+    </div>
+
+    <div class="q-type" id="qCategory">QUIZ</div>
+    <h2 id="qText">Question loading...</h2>
+
+    <div class="img-container" id="imgBox" style="display: none;">
+      <img id="qImage" src="" alt="Question Image" />
+    </div>
+
+    <div id="statusTag" class="status-tag" style="display: none;">🔒 उत्तर लॉक झाले आहे!</div>
+
+    <div class="options-grid" id="optionsContainer"></div>
+
+    <div class="nav-btns">
+      <button class="action-btn secondary" id="prevBtn" disabled>Previous</button>
+      <button class="action-btn" id="nextBtn">Next ➔</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, getDoc } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCePBzR9A533G67wycWgGRluEu1wMGujYg",
+      authDomain: "reunion-2k26.firebaseapp.com",
+      projectId: "reunion-2k26",
+      storageBucket: "reunion-2k26.firebasestorage.app",
+      messagingSenderId: "982280621446",
+      appId: "1:982280621446:web:851f2d3e55b854ad077007"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const playerId = localStorage.getItem('reunionPlayerId');
+    const playerName = localStorage.getItem('reunionPlayerName');
+
+    if(!playerId) {
+      window.location.replace('index.html');
+    }
+
+    document.getElementById('playerTag').textContent = (playerName || 'PLAYER').toUpperCase();
+
+    let questions = [];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let playerOptions = [];
+
+    async function initGame() {
+      // Load Default Players (Up to 10)
+      try {
+        const pSnap = await getDocs(collection(db, "players"));
+        pSnap.forEach(d => {
+          if(d.data().active !== false) {
+            playerOptions.push({ id: d.id, name: d.data().name });
+          }
+        });
+      } catch(e) {}
+
+      if(playerOptions.length < 10) {
+        const temp = ["Rahul", "Priya", "Amit", "Sneha", "Vikram", "Rohan", "Aniket", "Pooja", "Neha", "Kiran"];
+        while(playerOptions.length < 10 && temp.length > 0) {
+          const n = temp.shift();
+          if(!playerOptions.some(p => p.name === n)) {
+            playerOptions.push({ id: "p_" + playerOptions.length, name: n });
+          }
+        }
+      }
+      playerOptions = playerOptions.slice(0, 10);
+
+      // Load Questions
+      try {
+        const qSnap = await getDocs(collection(db, "questions"));
+        if(!qSnap.empty) {
+          questions = [];
+          qSnap.forEach(d => questions.push({id: d.id, ...d.data()}));
+        }
+      } catch(e) {}
+
+      if(questions.length === 0) {
+        questions = [
+          { id: "q1", category: "Standard Q", text: "Group madhye saglyat jaast late yenara kon?", type: "vote" }
+        ];
+      }
+
+      // Load Saved Answers
+      try {
+        const ansDoc = await getDoc(doc(db, "votes", playerId));
+        if(ansDoc.exists()) {
+          userAnswers = ansDoc.data().answers || {};
+        }
+      } catch(e) {}
+
+      let firstUnanswered = questions.findIndex(q => !userAnswers[q.id]);
+      if(firstUnanswered !== -1) {
+        currentIndex = firstUnanswered;
+      }
+
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById('progressText').textContent = `Q ${currentIndex + 1} / ${questions.length}`;
+      document.getElementById('qCategory').textContent = q.category || "QUESTION";
+      document.getElementById('qText').textContent = q.text;
+
+      const imgBox = document.getElementById('imgBox');
+      const qImage = document.getElementById('qImage');
+
+      if(q.imageUrl) {
+        qImage.src = q.imageUrl;
+        imgBox.style.display = "flex";
+      } else {
+        imgBox.style.display = "none";
+      }
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      const isAnswered = !!userAnswers[q.id];
+      document.getElementById('statusTag').style.display = isAnswered ? 'block' : 'none';
+
+      let finalOptions = [];
+      if (q.customOptions && Array.isArray(q.customOptions) && q.customOptions.length > 0) {
+        finalOptions = q.customOptions.map((optName, index) => ({
+          id: "custom_" + index + "_" + optName,
+          name: optName
+        }));
+      } else {
+        finalOptions = playerOptions;
+      }
+
+      finalOptions.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        if(userAnswers[q.id] === p.id) {
+          btn.classList.add('selected');
+        }
+        btn.textContent = p.name;
+        btn.disabled = isAnswered;
+
+        if(!isAnswered) {
+          btn.onclick = () => selectOption(q.id, p.id);
+        }
+        container.appendChild(btn);
+      });
+
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+      const nextBtn = document.getElementById('nextBtn');
+      if(currentIndex === questions.length - 1) {
+        nextBtn.textContent = "Finish 🏆";
+      } else {
+        nextBtn.textContent = "Next ➔";
+      }
+    }
+
+    async function selectOption(qId, selectedPlayerId) {
+      if(userAnswers[qId]) return;
+
+      userAnswers[qId] = selectedPlayerId;
+      renderQuestion();
+
+      try {
+        await setDoc(doc(db, "votes", playerId), {
+          playerName: playerName,
+          answers: userAnswers,
+          updatedAt: new Date()
+        }, { merge: true });
+      } catch(e) { console.error("Auto-save error:", e); }
+    }
+
+    document.getElementById('prevBtn').onclick = () => {
+      if(currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    };
+
+    document.getElementById('nextBtn').onclick = () => {
+      if(currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        alert("अभिनंदन! तुम्ही सर्व प्रश्नांची उत्तरे यशस्वीपणे सबमिट केली आहेत. 🎉");
+      }
+    };
+
+    initGame();
+  </script>
+</body>
+</html>

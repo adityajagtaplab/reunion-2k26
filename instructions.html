@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Instructions — Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--paper);
+    border: 3px solid var(--maroon);
+    border-radius: 18px;
+    padding: 26px 22px 24px;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--mustard);
+  }
+
+  .stamp {
+    position: absolute;
+    top: -18px;
+    left: 18px;
+    background: var(--mustard);
+    color: var(--maroon-dark);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    transform: rotate(-5deg);
+    box-shadow: 2px 2px 0 var(--maroon);
+  }
+
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--maroon);
+    font-size: 28px;
+    margin: 12px 0 4px;
+    line-height: 1.15;
+  }
+
+  .greeting {
+    font-size: 14px;
+    color: #6B6354;
+    margin-bottom: 20px;
+  }
+
+  .greeting span {
+    font-weight: 600;
+    color: var(--maroon-dark);
+  }
+
+  .rule {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .rule:last-of-type {
+    border-bottom: none;
+  }
+
+  .rule-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+  }
+
+  .rule-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  .rule-text b {
+    color: var(--maroon-dark);
+  }
+
+  .note {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: #FBF3DC;
+    border: 1.5px dashed var(--mustard);
+    border-radius: 10px;
+    font-size: 12.5px;
+    color: var(--maroon-dark);
+    text-align: center;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    font-family: 'Permanent Marker', cursive;
+    font-size: 19px;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: var(--maroon);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.2s ease;
+  }
+
+  button:not(:disabled):active {
+    transform: scale(0.97);
+    background: var(--maroon-dark);
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="stamp">RULES</div>
+    <h1>HOW TO PLAY ??</h1>
+    <p class="greeting">WELCOME, <span id="playerNameLabel">FRIENDS</span> 👋</p>
+
+    <div class="rule">
+      <div class="rule-icon">❓</div>
+      <div class="rule-text"><b>5 प्रकारचे प्रश्न</b> असतील — साधे प्रश्न, quiz, childhood photo ओळख, zoomed photo ओळख, आणि जुनी caption/status ओळख.</div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-icon">🗳️</div>
+      <div class="rule-text">प्रत्येक प्रश्नात <b>ग्रुपमधल्या कोणालातरी vote</b> करायचं. सगळ्यात जास्त votes मिळालेली व्यक्ती = "accepted answer".</div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-icon">🏆</div>
+      <div class="rule-text">accepted answer <b>बरोबर ओळखणाऱ्यांना point</b> मिळतो. सगळ्यात जास्त बरोबर guesses करणारा जिंकतो.</div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-icon">✅</div>
+      <div class="rule-text">जिंकण्यासाठी <b>सगळे प्रश्न/quiz 100% attempt</b> करणं गरजेचं आहे.</div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-icon">🔒</div>
+      <div class="rule-text"><b>एकदा उत्तर दिल्यावर ते बदलता येणार नाही!</b> त्यामुळे नीट विचार करून उत्तर निवडा.</div>
+    </div>
+
+    <div class="rule">
+      <div class="rule-icon">🤫</div>
+      <div class="rule-text">Winner <b>reunion च्या दिवशीच</b> कळेल — तोपर्यंत पूर्ण secret!</div>
+    </div>
+
+    <div class="note">तुझी progress आपोआप save होते, कधीही सोडून परत येऊ शकतोस</div>
+
+    <button id="playBtn">Play Now 🚀</button>
+  </div>
+
+  <script>
+    const entered = localStorage.getItem('reunionEntered');
+    const playerName = localStorage.getItem('reunionPlayerName');
+
+    if (!entered) {
+      window.location.replace('index.html');
+    } else if (playerName) {
+      document.getElementById('playerNameLabel').textContent = playerName.toUpperCase();
+    }
+
+    // Prevent Back Navigation to index.html
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+      history.pushState(null, null, location.href);
+    };
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      window.location.href = 'game.html';
+    });
+  </script>
+
+</body>
+</html>
