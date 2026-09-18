@@ -60,33 +60,47 @@
   .result-box {
     text-align: left;
     margin-top: 15px;
-    max-height: 350px;
+    max-height: 380px;
     overflow-y: auto;
   }
 
-  .q-card {
+  .winner-card {
     background: #fff;
     border: 2px solid var(--line);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .q-title {
-    font-weight: 600;
+  .rank-1 { border: 2px solid #D9A441; background: #FFFDF5; }
+  .rank-2 { border: 2px solid #A0A0A0; background: #F8F8F8; }
+  .rank-3 { border: 2px solid #CD7F32; background: #FAFFFC; }
+
+  .rank-badge {
+    font-size: 24px;
+    margin-right: 12px;
+  }
+
+  .player-info {
+    flex-grow: 1;
+  }
+
+  .player-name {
+    font-weight: 700;
+    font-size: 16px;
     color: var(--maroon-dark);
-    font-size: 13px;
   }
 
-  .winner-name {
+  .score-badge {
     font-family: 'Permanent Marker', cursive;
-    color: var(--mustard);
-    font-size: 18px;
-    margin-top: 4px;
     background: var(--maroon);
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 6px;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 14px;
   }
 
   .badge {
@@ -103,7 +117,7 @@
 
   <div class="card">
     <span class="badge">REUNION 2K26</span>
-    <h1>🏆 WINNERS 🏆</h1>
+    <h1>🏆 TOP 3 WINNERS 🏆</h1>
 
     <div id="lockState">
       <div style="font-size: 50px; margin: 15px 0;">🤫🔒</div>
@@ -112,7 +126,7 @@
 
     <div id="resultState" style="display: none;">
       <div class="result-box" id="resultsContainer">
-        <!-- Winners load here -->
+        <!-- Top 3 Winners Load Here -->
       </div>
     </div>
   </div>
@@ -141,48 +155,88 @@
       if (isPublished) {
         document.getElementById('lockState').style.display = 'none';
         document.getElementById('resultState').style.display = 'block';
-        calculateWinners();
+        calculateTop3Winners();
       }
     }
 
-    async function calculateWinners() {
+    async function calculateTop3Winners() {
       const container = document.getElementById('resultsContainer');
-      container.innerHTML = 'मोजणी चालू आहे... ⏳';
+      container.innerHTML = '<p style="text-align:center;">मोजणी चालू आहे... ⏳</p>';
 
       const qSnap = await getDocs(collection(db, "questions"));
       const vSnap = await getDocs(collection(db, "votes"));
+      const pSnap = await getDocs(collection(db, "players"));
+
+      // 1. Map Player IDs to Names
+      let playerNames = {};
+      pSnap.forEach(d => {
+        playerNames[d.id] = d.data().name;
+      });
 
       let questions = [];
-      qSnap.forEach(d => questions.push({id: d.id, ...d.data()}));
+      qSnap.forEach(d => questions.push({ id: d.id, ...d.data() }));
 
-      let votesData = [];
-      vSnap.forEach(d => votesData.push(d.data().answers || {}));
+      let votesDocs = [];
+      vSnap.forEach(d => votesDocs.push({ playerId: d.id, answers: d.data().answers || {} }));
 
-      container.innerHTML = '';
-
+      // 2. Find Majority Answer (Right Answer) for each Question
+      let rightAnswers = {};
       questions.forEach(q => {
         let tally = {};
-        votesData.forEach(ans => {
-          let votedId = ans[q.id];
-          if(votedId) {
-            tally[votedId] = (tally[votedId] || 0) + 1;
+        votesDocs.forEach(v => {
+          let ans = v.answers[q.id];
+          if (ans) {
+            tally[ans] = (tally[ans] || 0) + 1;
           }
         });
 
-        let winner = "No Votes";
-        let maxVotes = 0;
-        for(let key in tally) {
-          if(tally[key] > maxVotes) {
-            maxVotes = tally[key];
-            winner = key.replace(/^custom_\d+_/, '');
+        let majorityAns = null;
+        let maxCount = 0;
+        for (let ansKey in tally) {
+          if (tally[ansKey] > maxCount) {
+            maxCount = tally[ansKey];
+            majorityAns = ansKey;
           }
         }
+        rightAnswers[q.id] = majorityAns;
+      });
 
+      // 3. Calculate Scores for Each Player
+      let playerScores = [];
+      votesDocs.forEach(v => {
+        let score = 0;
+        for (let qId in rightAnswers) {
+          if (v.answers[qId] && v.answers[qId] === rightAnswers[qId]) {
+            score++;
+          }
+        }
+        let name = playerNames[v.playerId] || v.playerId;
+        playerScores.push({ name: name, score: score });
+      });
+
+      // Sort by Highest Score
+      playerScores.sort((a, b) => b.score - a.score);
+
+      // 4. Render Top 3 Winners
+      container.innerHTML = '';
+      if (playerScores.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">अजून कोणत्याही व्होट्सची नोंद झालेली नाही.</p>';
+        return;
+      }
+
+      const rankIcons = ['🥇', '🥈', '🥉'];
+      const topWinners = playerScores.slice(0, 3);
+
+      topWinners.forEach((p, index) => {
         const div = document.createElement('div');
-        div.className = 'q-card';
+        div.className = `winner-card rank-${index + 1}`;
         div.innerHTML = `
-          <div class="q-title">${q.text}</div>
-          <div>Winner: <span class="winner-name">${winner}</span> (${maxVotes} votes)</div>
+          <div class="rank-badge">${rankIcons[index]}</div>
+          <div class="player-info">
+            <div class="player-name">${p.name}</div>
+            <div style="font-size: 12px; color: #666;">Rank ${index + 1}</div>
+          </div>
+          <div class="score-badge">${p.score} Pts</div>
         `;
         container.appendChild(div);
       });
