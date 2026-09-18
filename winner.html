@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Winners — Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper);
+    border: 3px solid var(--maroon);
+    border-radius: 18px;
+    padding: 26px 22px 24px;
+    position: relative;
+    box-shadow: 6px 6px 0 var(--mustard);
+    text-align: center;
+  }
+
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--maroon);
+    font-size: 32px;
+    margin: 10px 0 6px;
+  }
+
+  .locked-msg {
+    font-size: 15px;
+    color: #6B6354;
+    margin: 20px 0;
+  }
+
+  .result-box {
+    text-align: left;
+    margin-top: 15px;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  .q-card {
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .q-title {
+    font-weight: 600;
+    color: var(--maroon-dark);
+    font-size: 13px;
+  }
+
+  .winner-name {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--mustard);
+    font-size: 18px;
+    margin-top: 4px;
+    background: var(--maroon);
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+  }
+
+  .badge {
+    background: var(--mustard);
+    color: var(--maroon-dark);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 50px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <span class="badge">REUNION 2K26</span>
+    <h1>🏆 WINNERS 🏆</h1>
+
+    <div id="lockState">
+      <div style="font-size: 50px; margin: 15px 0;">🤫🔒</div>
+      <p class="locked-msg">निकाल अजून जाहीर झालेला नाही!<br><b>Reunion च्या दिवशी थेट स्टेजवर निकाल घोषित होईल!</b></p>
+    </div>
+
+    <div id="resultState" style="display: none;">
+      <div class="result-box" id="resultsContainer">
+        <!-- Winners load here -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCePBzR9A533G67wycWgGRluEu1wMGujYg",
+      authDomain: "reunion-2k26.firebaseapp.com",
+      projectId: "reunion-2k26",
+      storageBucket: "reunion-2k26.firebasestorage.app",
+      messagingSenderId: "982280621446",
+      appId: "1:982280621446:web:851f2d3e55b854ad077007"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function checkStatus() {
+      const configSnap = await getDoc(doc(db, "config", "Settings"));
+      const isPublished = configSnap.exists() && configSnap.data().showWinners === true;
+
+      if (isPublished) {
+        document.getElementById('lockState').style.display = 'none';
+        document.getElementById('resultState').style.display = 'block';
+        calculateWinners();
+      }
+    }
+
+    async function calculateWinners() {
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = 'मोजणी चालू आहे... ⏳';
+
+      const qSnap = await getDocs(collection(db, "questions"));
+      const vSnap = await getDocs(collection(db, "votes"));
+
+      let questions = [];
+      qSnap.forEach(d => questions.push({id: d.id, ...d.data()}));
+
+      let votesData = [];
+      vSnap.forEach(d => votesData.push(d.data().answers || {}));
+
+      container.innerHTML = '';
+
+      questions.forEach(q => {
+        let tally = {};
+        votesData.forEach(ans => {
+          let votedId = ans[q.id];
+          if(votedId) {
+            tally[votedId] = (tally[votedId] || 0) + 1;
+          }
+        });
+
+        let winner = "No Votes";
+        let maxVotes = 0;
+        for(let key in tally) {
+          if(tally[key] > maxVotes) {
+            maxVotes = tally[key];
+            winner = key.replace(/^custom_\d+_/, '');
+          }
+        }
+
+        const div = document.createElement('div');
+        div.className = 'q-card';
+        div.innerHTML = `
+          <div class="q-title">${q.text}</div>
+          <div>Winner: <span class="winner-name">${winner}</span> (${maxVotes} votes)</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    checkStatus();
+  </script>
+</body>
+</html>
