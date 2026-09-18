@@ -136,13 +136,13 @@
     </select>
 
     <label>Question Text</label>
-    <input type="text" id="qText" placeholder="उदा. लहानपणीचा फोटो कोणाचा आहे?" />
+    <input type="text" id="qText" placeholder="enter question" />
 
     <label>Image URL (Optional)</label>
     <input type="text" id="qImg" placeholder="https://..." />
 
-    <label>Custom Options (Optional - Comma `,` देउन पर्याय टाका)</label>
-    <textarea id="qCustomOptions" rows="2" placeholder="eg. Rahul, Priya, Canteen, Warden..."></textarea>
+    <label>Custom Options (Optional - put  Comma `,` between options)</label>
+    <textarea id="qCustomOptions" rows="2" placeholder="eg. Aditya J, Siddhant, PDU, Warden..."></textarea>
 
     <button id="addQBtn">Add Question</button>
 
@@ -190,7 +190,7 @@
     const currentState = currentSnap.exists() ? currentSnap.data().showWinners : false;
     
     await setDoc(doc(db, "config", "Settings"), { showWinners: !currentState }, { merge: true });
-    alert(!currentState ? "Winner Live झाले आहेत!" : "Winner परत Hide केले आहेत!");
+    alert(!currentState ? "Winner Are Live Now!" : "Winner Are Hidden Now!");
   };
 
   async function loadPlayersList() {
