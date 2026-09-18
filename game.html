@@ -196,7 +196,7 @@
       <img id="qImage" src="" alt="Question Image" />
     </div>
 
-    <div id="statusTag" class="status-tag" style="display: none;">🔒 उत्तर लॉक झाले आहे!</div>
+    <div id="statusTag" class="status-tag" style="display: none;">Answer is locked 🔒!</div>
 
     <div class="options-grid" id="optionsContainer"></div>
 
@@ -249,7 +249,7 @@
       } catch(e) {}
 
       if(playerOptions.length < 10) {
-        const temp = ["Rahul", "Priya", "Amit", "Sneha", "Vikram", "Rohan", "Aniket", "Pooja", "Neha", "Kiran"];
+        const temp = ["Vishvajeet", "Shonit", "Aditya J", "Savli", "Siddhant", "", "Aniket", "Pooja", "Neha", "Kiran"];
         while(playerOptions.length < 10 && temp.length > 0) {
           const n = temp.shift();
           if(!playerOptions.some(p => p.name === n)) {
