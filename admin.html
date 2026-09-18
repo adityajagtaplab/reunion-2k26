@@ -108,10 +108,10 @@
     <label>Current Access Code</label>
     <input type="text" id="accessCodeInput" placeholder="2026" />
     <button id="saveCodeBtn">Save Access Code</button>
-<!-- Admin HTML madhye code save btn chya khali he taka -->
-<button id="toggleWinnerBtn" style="background: #2e7a46; margin-top: 10px;">Publish Winners 🚀</button>
-</div>
-  
+    <br>
+    <button id="toggleWinnerBtn" style="background: #2e7a46; margin-top: 10px;">Publish Winners 🚀</button>
+  </div>
+
   <!-- MANAGE PLAYERS -->
   <div class="card">
     <h2>2. Manage Players</h2>
@@ -141,8 +141,8 @@
     <label>Image URL (Optional)</label>
     <input type="text" id="qImg" placeholder="https://..." />
 
-    <label>Custom Options (Optional - Comma `,` देउन खेळाडू/पर्याय टाका. रिकामे ठेवल्यास default 10 खेळाडू दिसतील)</label>
-    <textarea id="qCustomOptions" rows="2" placeholder="eg. Rahul, Priya, Canteen, Warden, Option 5..."></textarea>
+    <label>Custom Options (Optional - Comma `,` देउन पर्याय टाका)</label>
+    <textarea id="qCustomOptions" rows="2" placeholder="eg. Rahul, Priya, Canteen, Warden..."></textarea>
 
     <button id="addQBtn">Add Question</button>
 
@@ -169,7 +169,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Load Access Code
   async function loadSettings() {
     const snap = await getDoc(doc(db, "config", "Settings"));
     if(snap.exists()) {
@@ -181,12 +180,19 @@
   document.getElementById('saveCodeBtn').onclick = async () => {
     const code = document.getElementById('accessCodeInput').value.trim();
     if(code) {
-      await setDoc(doc(db, "config", "Settings"), { accessCode: code });
+      await setDoc(doc(db, "config", "Settings"), { accessCode: code }, { merge: true });
       alert("Access Code Saved!");
     }
   };
 
-  // Players Management
+  document.getElementById('toggleWinnerBtn').onclick = async () => {
+    const currentSnap = await getDoc(doc(db, "config", "Settings"));
+    const currentState = currentSnap.exists() ? currentSnap.data().showWinners : false;
+    
+    await setDoc(doc(db, "config", "Settings"), { showWinners: !currentState }, { merge: true });
+    alert(!currentState ? "Winner Live झाले आहेत!" : "Winner परत Hide केले आहेत!");
+  };
+
   async function loadPlayersList() {
     const snap = await getDocs(collection(db, "players"));
     const container = document.getElementById('playersList');
@@ -214,7 +220,6 @@
     }
   };
 
-  // Questions Management
   async function loadQuestionsList() {
     const snap = await getDocs(collection(db, "questions"));
     const container = document.getElementById('questionsList');
@@ -233,7 +238,6 @@
     loadQuestionsList();
   };
 
-  // Add Question Logic Updated
   document.getElementById('addQBtn').onclick = async () => {
     const cat = document.getElementById('qCategory').value;
     const text = document.getElementById('qText').value.trim();
@@ -261,15 +265,6 @@
 
     loadQuestionsList();
   };
-
-  document.getElementById('toggleWinnerBtn').onclick = async () => {
-  const currentSnap = await getDoc(doc(db, "config", "Settings"));
-  const currentState = currentSnap.exists() ? currentSnap.data().showWinners : false;
-  
-  await setDoc(doc(db, "config", "Settings"), { showwinners: !currentState }, { merge: true });
-  alert(!currentState ? "Winner Live झाले आहेत!" : "Winner परत Hide केले आहेत!");
-};
-
 </script>
 
 </body>
