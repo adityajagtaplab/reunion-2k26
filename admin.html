@@ -108,11 +108,9 @@
     <label>Current Access Code</label>
     <input type="text" id="accessCodeInput" placeholder="2026" />
     <button id="saveCodeBtn">Save Access Code</button>
-  </div>
-
 <!-- Admin HTML madhye code save btn chya khali he taka -->
 <button id="toggleWinnerBtn" style="background: #2e7a46; margin-top: 10px;">Publish Winners 🚀</button>
-
+</div>
   
   <!-- MANAGE PLAYERS -->
   <div class="card">
@@ -263,6 +261,15 @@
 
     loadQuestionsList();
   };
+
+  document.getElementById('toggleWinnerBtn').onclick = async () => {
+  const currentSnap = await getDoc(doc(db, "config", "Settings"));
+  const currentState = currentSnap.exists() ? currentSnap.data().showWinners : false;
+  
+  await setDoc(doc(db, "config", "Settings"), { showwinners: !currentState }, { merge: true });
+  alert(!currentState ? "Winner Live झाले आहेत!" : "Winner परत Hide केले आहेत!");
+};
+
 </script>
 
 </body>
