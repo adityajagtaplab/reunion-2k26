@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>All Responses — Reunion 2k26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F0DE;
+    --paper: #FFFBF2;
+    --maroon: #7A2E2E;
+    --mustard: #D9A441;
+    --ink: #2E2A24;
+    --line: #D8CBA8;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px);
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    padding: 24px 16px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    color: var(--maroon);
+    font-size: 28px;
+    margin: 10px 0;
+  }
+
+  .badge {
+    background: var(--mustard);
+    color: var(--maroon);
+    font-family: 'Permanent Marker', cursive;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 50px;
+  }
+
+  .q-card {
+    background: var(--paper);
+    border: 2px solid var(--maroon);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 4px 4px 0 var(--mustard);
+  }
+
+  .q-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--maroon);
+    margin-bottom: 12px;
+    border-bottom: 2px dashed var(--line);
+    padding-bottom: 8px;
+  }
+
+  .response-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .response-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .player-name {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .selected-option {
+    background: #f0e6d2;
+    color: var(--maroon);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <span class="badge">REUNION 2K26</span>
+      <h1>📊 ALL RESPONSES 📊</h1>
+    </div>
+
+    <div id="detailsContainer">
+      <p style="text-align:center;">Loading... ⏳</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } 
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCePBzR9A533G67wycWgGRluEu1wMGujYg",
+      authDomain: "reunion-2k26.firebaseapp.com",
+      projectId: "reunion-2k26",
+      storageBucket: "reunion-2k26.firebasestorage.app",
+      messagingSenderId: "982280621446",
+      appId: "1:982280621446:web:851f2d3e55b854ad077007"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadAllDetails() {
+      const container = document.getElementById('detailsContainer');
+
+      const qSnap = await getDocs(collection(db, "questions"));
+      const vSnap = await getDocs(collection(db, "votes"));
+      const pSnap = await getDocs(collection(db, "players"));
+
+      // 1. Map Player IDs to Real Names
+      let playerNames = {};
+      pSnap.forEach(d => {
+        playerNames[d.id] = d.data().name;
+      });
+
+      let questions = [];
+      qSnap.forEach(d => questions.push({ id: d.id, ...d.data() }));
+
+      let votesDocs = [];
+      vSnap.forEach(d => {
+        let rawId = d.id;
+        let data = d.data();
+        votesDocs.push({ 
+          playerId: rawId, 
+          playerName: playerNames[rawId] || data.playerName || data.name || rawId, 
+          answers: data.answers || {} 
+        });
+      });
+
+      container.innerHTML = '';
+
+      if(questions.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">Questions are not found!</p>';
+        return;
+      }
+
+      // 2. Loop through each question and render responses
+      questions.forEach((q, index) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'q-card';
+
+        let responsesHTML = '';
+
+        votesDocs.forEach(v => {
+          let selectedVal = v.answers[q.id];
+          if(selectedVal) {
+            // Convert choice ID to name if player was selected
+            let choiceText = playerNames[selectedVal] || selectedVal.replace(/^custom_\d+_/, '');
+            responsesHTML += `
+              <div class="response-item">
+                <span class="player-name">${v.playerName}</span>
+                <span class="selected-option">${choiceText}</span>
+              </div>
+            `;
+          }
+        });
+
+        if(!responsesHTML) {
+          responsesHTML = '<div style="font-size: 13px; color: #888;">No votes for this!</div>';
+        }
+
+        qCard.innerHTML = `
+          <div class="q-title">Q${index + 1}. ${q.text}</div>
+          <div class="response-list">
+            ${responsesHTML}
+          </div>
+        `;
+
+        container.appendChild(qCard);
+      });
+    }
+
+    loadAllDetails();
+  </script>
+</body>
+</html>
