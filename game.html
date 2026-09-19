@@ -249,7 +249,7 @@
       } catch(e) {}
 
       if(playerOptions.length < 10) {
-        const temp = ["Vishvajeet", "Shonit", "Aditya J", "Savli", "Siddhant", "", "Aniket", "Samarth C", "Digvijay", "Mali"];
+        const temp = [];
         while(playerOptions.length < 10 && temp.length > 0) {
           const n = temp.shift();
           if(!playerOptions.some(p => p.name === n)) {
