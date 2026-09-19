@@ -161,7 +161,7 @@
 
     async function calculateTop3Winners() {
       const container = document.getElementById('resultsContainer');
-      container.innerHTML = '<p style="text-align:center;">मोजणी चालू आहे... ⏳</p>';
+      container.innerHTML = '<p style="text-align:center;">Counting... ⏳</p>';
 
       const qSnap = await getDocs(collection(db, "questions"));
       const vSnap = await getDocs(collection(db, "votes"));
