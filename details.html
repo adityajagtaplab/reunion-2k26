@@ -11,6 +11,7 @@
     --cream: #F7F0DE;
     --paper: #FFFBF2;
     --maroon: #7A2E2E;
+    --maroon-dark: #5C2020;
     --mustard: #D9A441;
     --ink: #2E2A24;
     --line: #D8CBA8;
@@ -37,7 +38,7 @@
 
   .header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
   h1 {
@@ -56,6 +57,46 @@
     border-radius: 50px;
   }
 
+  /* Horizontal Question Navigation Strip */
+  .strip-wrapper {
+    width: 100%;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 8px;
+    padding: 4px 2px 8px 2px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 10;
+  }
+
+  .strip-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .q-pill {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0 var(--line);
+  }
+
+  .q-pill:active {
+    background: var(--maroon);
+    color: #fff;
+  }
+
   .q-card {
     background: var(--paper);
     border: 2px solid var(--maroon);
@@ -63,6 +104,7 @@
     padding: 18px;
     margin-bottom: 20px;
     box-shadow: 4px 4px 0 var(--mustard);
+    scroll-margin-top: 60px;
   }
 
   .q-title {
@@ -114,6 +156,9 @@
       <h1>📊 ALL RESPONSES 📊</h1>
     </div>
 
+    <!-- Navigation Strip -->
+    <div class="strip-wrapper" id="questionStrip"></div>
+
     <div id="detailsContainer">
       <p style="text-align:center;">Loading... ⏳</p>
     </div>
@@ -138,6 +183,7 @@
 
     async function loadAllDetails() {
       const container = document.getElementById('detailsContainer');
+      const stripContainer = document.getElementById('questionStrip');
 
       const qSnap = await getDocs(collection(db, "questions"));
       const vSnap = await getDocs(collection(db, "votes"));
@@ -152,6 +198,9 @@
       let questions = [];
       qSnap.forEach(d => questions.push({ id: d.id, ...d.data() }));
 
+      // Sort questions based on the 'order' field
+      questions.sort((a, b) => (a.order || 0) - (b.order || 0));
+
       let votesDocs = [];
       vSnap.forEach(d => {
         let rawId = d.id;
@@ -164,16 +213,33 @@
       });
 
       container.innerHTML = '';
+      stripContainer.innerHTML = '';
 
       if(questions.length === 0) {
         container.innerHTML = '<p style="text-align:center;">Questions are not found!</p>';
         return;
       }
 
-      // 2. Loop through each question and render responses
+      // 2. Render Navigation Strip & Questions List
       questions.forEach((q, index) => {
+        const qId = `q_card_${index}`;
+
+        // Add Pill to Strip
+        const pill = document.createElement('div');
+        pill.className = 'q-pill';
+        pill.textContent = `Q${index + 1}`;
+        pill.onclick = () => {
+          const cardEl = document.getElementById(qId);
+          if (cardEl) {
+            cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+        stripContainer.appendChild(pill);
+
+        // Render Question Card
         const qCard = document.createElement('div');
         qCard.className = 'q-card';
+        qCard.id = qId;
 
         let responsesHTML = '';
 
