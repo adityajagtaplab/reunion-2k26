@@ -141,7 +141,7 @@
     <label>Image URL (Optional)</label>
     <input type="text" id="qImg" placeholder="https://..." />
 
-    <label>Custom Options (Optional - put  Comma `,` between options)</label>
+    <label>Custom Options (Optional - put Comma `,` between options)</label>
     <textarea id="qCustomOptions" rows="2" placeholder="eg. Aditya J, Siddhant, PDU, Warden..."></textarea>
 
     <button id="addQBtn">Add Question</button>
@@ -190,7 +190,7 @@
     const currentState = currentSnap.exists() ? currentSnap.data().showWinners : false;
     
     await setDoc(doc(db, "config", "Settings"), { showWinners: !currentState }, { merge: true });
-    alert(!currentState ? "Winner Are Live Now!" : "Winner Are Hidden Now!");
+    alert(!currentState ? "Winners Are Live Now!" : "Winners Are Hidden Now!");
   };
 
   async function loadPlayersList() {
@@ -224,10 +224,17 @@
     const snap = await getDocs(collection(db, "questions"));
     const container = document.getElementById('questionsList');
     container.innerHTML = '';
-    snap.forEach(d => {
+
+    let qList = [];
+    snap.forEach(d => qList.push({ id: d.id, ...d.data() }));
+
+    // Sort questions by 'order'
+    qList.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    qList.forEach((q, idx) => {
       const div = document.createElement('div');
       div.className = 'list-item';
-      div.innerHTML = `<span><b>[${d.data().category}]</b> ${d.data().text}</span> <button class="btn-del" onclick="deleteQuestion('${d.id}')">Delete</button>`;
+      div.innerHTML = `<span><b>#${q.order || (idx + 1)} [${q.category}]</b> ${q.text}</span> <button class="btn-del" onclick="deleteQuestion('${q.id}')">Delete</button>`;
       container.appendChild(div);
     });
   }
@@ -251,11 +258,16 @@
       optionsArray = customOpts.split(',').map(item => item.trim()).filter(item => item !== "");
     }
 
+    // Get current total questions to determine the next order number
+    const snap = await getDocs(collection(db, "questions"));
+    const nextOrder = snap.size + 1;
+
     await addDoc(collection(db, "questions"), {
       category: cat,
       text: text,
       imageUrl: img || null,
       customOptions: optionsArray.length > 0 ? optionsArray : null,
+      order: nextOrder,
       createdAt: new Date()
     });
 
