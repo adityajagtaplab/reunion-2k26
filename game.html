@@ -28,9 +28,61 @@
     font-family: 'Poppins', sans-serif;
     color: var(--ink);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
+    padding: 16px;
+  }
+
+  /* Horizontal Question Strip Styling */
+  .strip-wrapper {
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    gap: 8px;
+    padding: 4px 2px 8px 2px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .strip-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .q-pill {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 2px 2px 0 var(--line);
+  }
+
+  .q-pill.active {
+    background: var(--maroon);
+    color: #fff;
+    border-color: var(--maroon-dark);
+    box-shadow: 2px 2px 0 var(--mustard);
+  }
+
+  .q-pill.answered {
+    border-color: #2e7d32;
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .q-pill.active.answered {
+    background: var(--maroon);
+    color: #fff;
+    border-color: #2e7d32;
   }
 
   .card {
@@ -183,6 +235,9 @@
 </head>
 <body>
 
+  <!-- Top Navigation Strip -->
+  <div class="strip-wrapper" id="questionStrip"></div>
+
   <div class="card">
     <div class="header-row">
       <span class="badge" id="playerTag">PLAYER</span>
@@ -238,7 +293,7 @@
     let playerOptions = [];
 
     async function initGame() {
-      // Load Default Players (Up to 10)
+      // Load Default Players
       try {
         const pSnap = await getDocs(collection(db, "players"));
         pSnap.forEach(d => {
@@ -290,7 +345,35 @@
       renderQuestion();
     }
 
+    function renderStrip() {
+      const stripContainer = document.getElementById('questionStrip');
+      stripContainer.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const pill = document.createElement('div');
+        const isAnswered = !!userAnswers[q.id];
+        
+        pill.className = `q-pill ${idx === currentIndex ? 'active' : ''} ${isAnswered ? 'answered' : ''}`;
+        pill.textContent = `Q${idx + 1}` + (isAnswered ? ' ✓' : '');
+        
+        pill.onclick = () => {
+          currentIndex = idx;
+          renderQuestion();
+        };
+
+        stripContainer.appendChild(pill);
+      });
+
+      // Auto scroll active pill into view
+      const activePill = stripContainer.children[currentIndex];
+      if (activePill) {
+        activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+
     function renderQuestion() {
+      renderStrip();
+
       const q = questions[currentIndex];
       document.getElementById('progressText').textContent = `Q ${currentIndex + 1} / ${questions.length}`;
       document.getElementById('qCategory').textContent = q.category || "QUESTION";
